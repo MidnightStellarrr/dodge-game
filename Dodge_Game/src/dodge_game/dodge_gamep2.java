@@ -2,6 +2,8 @@ package dodge_game;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -33,6 +36,7 @@ public class dodge_gamep2 extends JPanel implements KeyListener, ActionListener{
     //makes the blocks fall randomly
     //declare and initiate a variable
     Random random;
+    int blockSize = 40;
     
     //movement rules
     boolean movingLeft = false;    // Is the Left key in the keyboard being held?
@@ -93,22 +97,152 @@ public class dodge_gamep2 extends JPanel implements KeyListener, ActionListener{
 
     @Override
     public void keyTyped(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        //e contains the data about what just happened on the keyboard
+        //.getKeyCode() a method that retrieve the numerical ID of the key
+        //every key on your keyboard has a unique number assigned to it
+        int key = e.getKeyCode();
+        
+        //KeyEvent is a class in Java 
+        //VK_LEFT and VK_A is a varible in KeyEvent class that has the same value as key
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
+            movingLeft = true;
+        }
+        
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
+            movingRight = true;
+        }
+        
+        if (!running && key == KeyEvent.VK_ENTER) {
+            restartGame();
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        int key = e.getKeyCode();
+        
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
+            movingLeft = false;
+        }
+        
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
+            movingRight = false;
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (running) {
+            //Move Player to the left
+            if (movingLeft && playerX > 0) {
+                playerX -= playerSpeed;
+            }
+            
+            //Move Player to the right
+            if (movingRight && playerX < WIDTH - playerWidth) {
+                playerX += playerSpeed;
+            }
+            
+            tickCount++;
+            //if there's no remainder that is where the blocks will fall
+            if (tickCount % 25 == 0) {
+                int randomX = random.nextInt(WIDTH - blockSize);
+                //randomX the position of the new block
+                //0 the y position which is at the very top
+                //1st blockSize is the width, the 2nd is the height
+                //the creation of the block and placed it to arraylist
+                blocks.add(new Rectangle(randomX, 0, blockSize, blockSize));
+            }
+            
+            //a replica of the player to check if it hits the falling blocks
+            Rectangle playerRect = new Rectangle(playerX, playerY, playerWidth, playerHeight);
+            
+            for (int i = 0; i < blocks.size(); i++) {
+                //gets the block from the arraylist
+                Rectangle block = blocks.get(i);
+                //moves the falling blocks in 5 pixels
+                //the .y is prebuilt in rectangle class
+                block.y += 5;
+
+                //.intersects checks if two rectangles are overlapping
+                if (block.intersects(playerRect)) {
+                    //game over
+                    running = false; 
+                }
+
+                //the i goes from 0 to 1 then back to 0
+                //this creates the loop of falling blocks
+                if (block.y > HEIGHT) {
+                    blocks.remove(i);
+                    i--; 
+                    score += 10; 
+                }
+            }
+        }
+        //the bridge between your game logic and your drawing code.
+        //connects actionPerformed and paintComponent
+        repaint();
     }
     
+    //This is where the game actually draws everything on the screen.
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        if (running) {
+            // Draw Score
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 24));
+            g.drawString("Score: " + score, 20, 30);
+
+            // Draw Player (Blue rectangle)
+            g.setColor(Color.CYAN);
+            g.fillRect(playerX, playerY, playerWidth, playerHeight);
+
+            // Draw Blocks (Red rectangles)
+            g.setColor(Color.RED);
+            for (Rectangle block : blocks) {
+                g.fillRect(block.x, block.y, block.width, block.height);
+            }
+        } else {
+            // Draw Game Over Screen
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 50));
+            g.drawString("GAME OVER", 150, 280);
+            
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 30));
+            g.drawString("Final Score: " + score, 200, 330);
+            
+            g.setFont(new Font("Arial", Font.PLAIN, 20));
+            g.drawString("Press ENTER to restart", 190, 400);
+        }
+    }
+    
+    public void restartGame(){
+        playerX = WIDTH / 2;
+        blocks.clear();
+        score = 0;
+        tickCount = 0;
+        running = true;
+        timer.start(); 
+    }
+        
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Dodge the Blocks");
+        dodge_gamep2 game = new dodge_gamep2();
+        //the panel
+        frame.add(game);
+        //sizes the window to perfectly fit the panel inside it.
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null); // Center on screen
+        frame.setVisible(true);
+        //the line that actually gives the keyboard focus to your game
+        game.requestFocusInWindow(); 
+    }
 }
