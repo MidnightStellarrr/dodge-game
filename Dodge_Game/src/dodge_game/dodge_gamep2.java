@@ -1,11 +1,21 @@
 package dodge_game;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class dodge_gamep2 {
+//extends means inheriting from a parent class
+//having access to all of its code and features
+//implements means only specific methods in this class
+public class dodge_gamep2 extends JPanel implements KeyListener, ActionListener{
     //set the variables
     static final int WIDTH  = 600;   // The window is 600 wide
     static final int HEIGHT = 600;   // The window is 600 tall
@@ -22,7 +32,7 @@ public class dodge_gamep2 {
     
     //makes the blocks fall randomly
     //declare and initiate a variable
-    Random random = new Random();
+    Random random;
     
     //movement rules
     boolean movingLeft = false;    // Is the Left key in the keyboard being held?
@@ -48,5 +58,57 @@ public class dodge_gamep2 {
     
     //this means that the game will keep on running until false meaning game over
     boolean running = true;
+    
+    //first run by the system
+    public dodge_gamep2(){
+        //declarations
+        random = new Random();
+        blocks = new ArrayList<>();
+        
+        // Set window size
+        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        
+        // Set color
+        this.setBackground(Color.BLACK);
+        
+        //initiate that the system will have access to any keyboard actions
+        //from JPanel
+        this.setFocusable(true);
+        
+        //accepts any keyboard actions
+        //from KeyListener
+        //1st this is the thing that is actually connected to the physical keyboard.
+        //2nd this is the Guard (the Listener)
+        this.addKeyListener(this);
+        
+        // Build the clock
+        //from ActionListener
+        //When 20ms passes, send the tick to this object.
+        timer = new Timer(20, this);
+        
+        // Start the clock
+        timer.start();
+        
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }
