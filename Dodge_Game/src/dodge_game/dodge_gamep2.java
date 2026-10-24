@@ -3,6 +3,7 @@ package dodge_game;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.Timer;
 
 public class dodge_gamep2 {
     //set the variables
@@ -29,8 +30,23 @@ public class dodge_gamep2 {
     
     // How fast the player moves in pixels
     // a single move is equivalent to 7 pixels
-    int playerSpeed = 7;           
+    int playerSpeed = 7; 
     
+    //keeps the player and blocks moving from one place to another
+    //movement of blocks are continuous
+    //movemenent of the player are dependent of pressed key 
+    Timer timer;
     
+    int score = 0; //the score
+    
+    //record each 20ms that has passed
+    //tickCount record every 25 frames
+    //a single 20 ms is equivalent to 1 frame
+    //blocks falls every 25 frames
+    //listening to player movements is 20ms meaning every single frame
+    int tickCount = 0; 
+    
+    //this means that the game will keep on running until false meaning game over
+    boolean running = true;
     
 }
