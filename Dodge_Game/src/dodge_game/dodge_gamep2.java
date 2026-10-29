@@ -17,7 +17,7 @@ import javax.swing.Timer;
 
 //extends means inheriting from a parent class
 //having access to all of its code and features
-//implements means only specific methods in this class
+//implements means only specific methods in this parent class
 public class dodge_gamep2 extends JPanel implements KeyListener, ActionListener{
     //set the variables
     static final int WIDTH  = 600;   // The window is 600 wide
