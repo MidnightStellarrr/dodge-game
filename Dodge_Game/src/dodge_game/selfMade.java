@@ -18,6 +18,10 @@ import javax.swing.Timer;
 import java.awt.Image;
 import javax.imageio.ImageIO;
 import java.io.File;
+//bgm
+import javazoom.jl.player.Player;
+import java.io.FileInputStream;
+
 
 public class selfMade extends JPanel implements ActionListener, KeyListener {
 
@@ -97,8 +101,26 @@ public class selfMade extends JPanel implements ActionListener, KeyListener {
         } catch (Exception e) {
             System.out.println("Game Over image not found! Check the path.");
         }
+        
+        // Add your exact path to the MP3 file here
+        playMusic("C:\\Users\\Hannah\\Documents\\NetBeansProjects\\dodge-game\\Dodge_Game\\src\\dodge_game\\img\\bgm.mp3");
 
         timer.start();
+    }
+    
+    public void playMusic(String filePath) {
+        // We use a new Thread so the music doesn't freeze the game
+        new Thread(() -> {
+            try {
+                while (true) {
+                    FileInputStream fis = new FileInputStream(filePath);
+                    Player player = new Player(fis);
+                    player.play();
+                }
+            } catch (Exception e) {
+                System.out.println("Music error: " + e.getMessage());
+            }
+        }).start();
     }
 
     public void restartGame() {
