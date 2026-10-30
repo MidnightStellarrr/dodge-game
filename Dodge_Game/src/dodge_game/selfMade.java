@@ -18,82 +18,83 @@ import javax.swing.Timer;
 import java.awt.Image;
 import javax.imageio.ImageIO;
 import java.io.File;
-//blur game over img
-import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
-//game over blur effect
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 
-public class selfMade extends JPanel implements ActionListener, KeyListener{
+public class selfMade extends JPanel implements ActionListener, KeyListener {
 
     static final int width = 600;
     static final int length = 600;
-    
-    int playerXPosition = width/2;
+
+    int playerXPosition = width / 2;
     int playerYPosition = length - 130;
-    
+
     //declare falling heart image
     Image fallingHeart;
     //declare player image
     Image playerImage;
     //declare bg image
     Image gameBackground;
-    
+    //declare game over screen image
+    Image gameOverScreen;
+
     int playerWidth = 45;
     int playerHeight = 65;
-    
+
     Timer timer;
     boolean movingLeft = false;
     boolean movingRight = false;
     int playerSpeed = 7;
-    
+
     ArrayList<Rectangle> blocks;
     Random random;
     int blockSize = 40;
     int tickCount = 0;
-    
+
     int score = 0;
-    
+
     boolean running = true;
-    
-    selfMade(){
-        this.setPreferredSize(new Dimension(width,length));
+
+    selfMade() {
+        this.setPreferredSize(new Dimension(width, length));
         setFocusable(true);
         this.addKeyListener(this);
         random = new Random();
         blocks = new ArrayList<>();
         timer = new Timer(20, this);
-        
+
         //image loader for falling hearts
         try {
-            // Using the exact path you provided
             fallingHeart = ImageIO.read(new File("C:\\Users\\Hannah\\Documents\\NetBeansProjects\\dodge-game\\Dodge_Game\\src\\dodge_game\\img\\fallling_hearts.png"));
         } catch (Exception e) {
-            System.out.println("Image not found! Check the path.");
+            System.out.println("Heart image not found! Check the path.");
         }
-        
+
         //image loader for player
         try {
             playerImage = ImageIO.read(new File("C:\\Users\\Hannah\\Documents\\NetBeansProjects\\dodge-game\\Dodge_Game\\src\\dodge_game\\img\\player.png"));
         } catch (Exception e) {
             System.out.println("Player image not found! Check the path.");
         }
-        
+
         //image loader for bg
         try {
             gameBackground = ImageIO.read(new File("C:\\Users\\Hannah\\Documents\\NetBeansProjects\\dodge-game\\Dodge_Game\\src\\dodge_game\\img\\game_bg.jpg"));
         } catch (Exception e) {
             System.out.println("Background image not found! Check the path.");
         }
-        
+
+        //image loader for game over screen
+        try {
+            gameOverScreen = ImageIO.read(new File("C:\\Users\\Hannah\\Documents\\NetBeansProjects\\dodge-game\\Dodge_Game\\src\\dodge_game\\img\\game_over_screen.png"));
+        } catch (Exception e) {
+            System.out.println("Game Over image not found! Check the path.");
+        }
+
         timer.start();
     }
-    
-    public void restartGame(){
-        if(!running){
-            playerXPosition = width/2;
+
+    public void restartGame() {
+        if (!running) {
+            playerXPosition = width / 2;
             blocks.clear();
             score = 0;
             tickCount = 0;
@@ -101,114 +102,84 @@ public class selfMade extends JPanel implements ActionListener, KeyListener{
             timer.start();
         }
     }
-    
-    public Image blurImage(BufferedImage image) {
-        // 1. Create a 3x3 blur matrix (this is the math that does the blurring)
-        float weight = 1.0f / 9.0f;
-        float[] matrix = {
-            weight, weight, weight,
-            weight, weight, weight,
-            weight, weight, weight
-        };
 
-        // 2. Create the filter
-        Kernel kernel = new Kernel(3, 3, matrix);
-        ConvolveOp op = new ConvolveOp(kernel);
-
-        // 3. Apply the blur and return the new image
-        BufferedImage blurredImage = new BufferedImage(
-            image.getWidth(), 
-            image.getHeight(), 
-            BufferedImage.TYPE_INT_ARGB
-        );
-
-        return op.filter(image, blurredImage);
-    }
-     
     @Override
-    public void paintComponent(Graphics g){
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 1. Draw Background
-        g.drawImage(gameBackground, 0, 0, width, length, this);
+        if (running) {
+            // 1. Draw Background
+            g.drawImage(gameBackground, 0, 0, width, length, this);
 
-        // 2. Draw Falling Hearts
-        for(Rectangle block : blocks){
-            g.drawImage(fallingHeart, block.x, block.y, block.width, block.height, this);            
-        }  
-
-        // 3. Draw Player
-        g.drawImage(playerImage, playerXPosition, playerYPosition, playerWidth, playerHeight, this);
-
-        // 4. Draw Score
-        g.setColor(Color.LIGHT_GRAY); 
-        g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Score: " + score, 450, 80);
-
-        // 5. If the game is over, apply the blur and draw the text
-        if (!running) {
-
-            // Create a BufferedImage to capture the current screen
-            BufferedImage screenshot = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2d = screenshot.createGraphics();
-
-            // Draw the current screen onto the screenshot
-            g2d.drawImage(gameBackground, 0, 0, null);
-            for(Rectangle block : blocks){
-                g2d.drawImage(fallingHeart, block.x, block.y, block.width, block.height, null);            
+            // 2. Draw Falling Hearts
+            for (Rectangle block : blocks) {
+                g.drawImage(fallingHeart, block.x, block.y, block.width, block.height, this);
             }
-            g2d.drawImage(playerImage, playerXPosition, playerYPosition, playerWidth, playerHeight, null);
-            g2d.dispose();
 
-            // Blur the screenshot
-            Image blurredScreen = blurImage(screenshot);
+            // 3. Draw Player
+            g.drawImage(playerImage, playerXPosition, playerYPosition, playerWidth, playerHeight, this);
 
-            // Draw the blurred screenshot OVER the sharp screen
-            g.drawImage(blurredScreen, 0, 0, width, length, this);
+            // 4. Draw Score
+            g.setColor(Color.LIGHT_GRAY);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Score: " + score, 450, 80);
 
-            // Draw Game Over Text on top of the blur
-            g.setColor(Color.RED);
-            g.setFont(new Font("Arial", Font.BOLD, 50));
-            g.drawString("GAME OVER", 150, 280);
+        } else {
+            // Draw the normal background first
+            g.drawImage(gameBackground, 0, 0, width, length, this);
 
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 30));
-            g.drawString("Final Score: " + score, 200, 330);
+            // Calculate the center position for the 200x200 image
+            int overlayWidth = 400;
+            int overlayHeight = 400;
+            int xPosition = (width - overlayWidth) / 2;
+            int yPosition = (length - overlayHeight) / 2;
 
-            g.setFont(new Font("Arial", Font.PLAIN, 20));
-            g.drawString("Press ENTER to restart", 190, 400);
+            // Draw the Game Over screen in the center
+            g.drawImage(gameOverScreen, xPosition, yPosition, overlayWidth, overlayHeight, this);
+
+            // Draw the text over it
+            g.setColor(Color.pink);
+            g.setFont(new Font("Arial", Font.BOLD, 35));
+            g.drawString("GAME OVER", 200, 250);
+
+            g.setColor(Color.LIGHT_GRAY);
+            g.setFont(new Font("Arial", Font.BOLD, 25));
+            g.drawString("Score: " + score, 255, 310);
+
+            g.setFont(new Font("Arial", Font.PLAIN, 15));
+            g.drawString("Press ENTER to restart", 225, 350);
         }
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-        if(running){
-            if(movingLeft && playerXPosition > 35){
+
+        if (running) {
+            if (movingLeft && playerXPosition > 35) {
                 playerXPosition -= playerSpeed;
             }
-            if(movingRight && playerXPosition < width - playerWidth - 35){
+            if (movingRight && playerXPosition < width - playerWidth - 35) {
                 playerXPosition += playerSpeed;
             }
             tickCount++;
-            if(tickCount % 25 == 0){
+            if (tickCount % 25 == 0) {
                 int minX = 35;
                 int maxX = width - blockSize - 35;
                 int randomX = minX + random.nextInt(maxX - minX);
                 blocks.add(new Rectangle(randomX, 0, blockSize, blockSize));
             }
-            
+
             Rectangle playerCollision = new Rectangle(playerXPosition, playerYPosition, playerWidth, playerHeight);
 
-            for(int i = 0; i < blocks.size(); i++){
+            for (int i = 0; i < blocks.size(); i++) {
                 Rectangle getBlock = blocks.get(i);
                 getBlock.y += 5;
 
-                if(getBlock.intersects(playerCollision)){
+                if (getBlock.intersects(playerCollision)) {
                     running = false;
                 }
-                
-                if(getBlock.y > length){
+
+                if (getBlock.y > length) {
                     blocks.remove(i);
                     i--;
                     score += 10;
@@ -221,22 +192,22 @@ public class selfMade extends JPanel implements ActionListener, KeyListener{
 
     @Override
     public void keyTyped(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        // Leave empty
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        
-        if(key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A){
+
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
             movingLeft = true;
         }
-        
-        if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D){
+
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
             movingRight = true;
         }
-        
-        if(!running && key == KeyEvent.VK_ENTER){
+
+        if (!running && key == KeyEvent.VK_ENTER) {
             restartGame();
         }
     }
@@ -244,16 +215,16 @@ public class selfMade extends JPanel implements ActionListener, KeyListener{
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-        
-        if(key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A){
+
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
             movingLeft = false;
         }
-        
-        if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D){
+
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
             movingRight = false;
         }
     }
-    
+
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         selfMade window = new selfMade();
@@ -263,7 +234,8 @@ public class selfMade extends JPanel implements ActionListener, KeyListener{
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
+        frame.setTitle("Dodge the Hearts");
         window.requestFocusInWindow();
     }
-    
+
 }
