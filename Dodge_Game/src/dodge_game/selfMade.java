@@ -35,6 +35,8 @@ public class selfMade extends JPanel implements ActionListener, KeyListener {
     Image gameBackground;
     //declare game over screen image
     Image gameOverScreen;
+    //declarescore bg image
+    Image scoreImage;
 
     int playerWidth = 45;
     int playerHeight = 65;
@@ -81,6 +83,13 @@ public class selfMade extends JPanel implements ActionListener, KeyListener {
         } catch (Exception e) {
             System.out.println("Background image not found! Check the path.");
         }
+        
+        //image loader for score bg
+        try {
+            scoreImage = ImageIO.read(new File("C:\\Users\\Hannah\\Documents\\NetBeansProjects\\dodge-game\\Dodge_Game\\src\\dodge_game\\img\\score_bg.png"));
+        } catch (Exception e) {
+            System.out.println("Background image not found! Check the path.");
+        }
 
         //image loader for game over screen
         try {
@@ -119,10 +128,13 @@ public class selfMade extends JPanel implements ActionListener, KeyListener {
             // 3. Draw Player
             g.drawImage(playerImage, playerXPosition, playerYPosition, playerWidth, playerHeight, this);
 
+            //draw score bg
+            g.drawImage(scoreImage, 380, 50, 167, 80, this);
+            
             // 4. Draw Score
-            g.setColor(Color.LIGHT_GRAY);
+            g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 20));
-            g.drawString("Score: " + score, 450, 80);
+            g.drawString("Score: " + score, 420, 100);
 
         } else {
             // Draw the normal background first
